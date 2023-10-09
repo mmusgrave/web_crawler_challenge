@@ -20,14 +20,6 @@ forum_subtext = soup.find_all("td", {"class": "subtext"}, limit=30)
 post_data = []
 
 for i in range(30):
-    # title
-    # list_of_things[0].find("span", {"class": "titleline"}).find("a").get_text()
-    # order_rank
-    # int(list_of_things[0].find("span", {"class": "rank"}).get_text().split('.')[0])
-    # comment_count ->
-    #  int(list_of_subtext[1].find_all("a")[-1].get_text().split('\xa0')[0])
-    # points -> score
-    # int(list_of_subtext[0].find("span", {"class": "score"}).get_text().split(' ')[0])
     post_info = {}
     post_info["name"] = forum_posts[i].find("span", {"class": "titleline"}).find("a").get_text()
     post_info["rank"] = int(forum_posts[i].find("span", {"class": "rank"}).get_text().split('.')[0])
@@ -44,4 +36,7 @@ for i in range(30):
 
 
 # if __name__ == '__main__':
+    # crawler = Crawler("https://news.ycombinator.com/")
+    # crawler.crawl()
+    
 #     # Run the script from here
