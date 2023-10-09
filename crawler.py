@@ -1,4 +1,5 @@
 import requests
+from pprint import pprint
 from bs4 import BeautifulSoup
 
 class Crawler:
@@ -39,7 +40,63 @@ class Crawler:
         # Returns relevant data
         return self.relevant_post_data
 
+    def long_titles_ordered_by_comments(self): # None -> List(Dict)
+        long_titles = []
+        for post in self.relevant_post_data:
+            if len(post["name"].split(" ")) > 5:
+                long_titles.append(post)
+
+        def get_post_comment_count(post): # Dict -> Int
+            return post["comment_count"]
+
+        long_titles.sort(key=get_post_comment_count)
+        return long_titles
+
+    def short_titles_ordered_by_score(self): # None -> List(Dict)
+        short_titles = []
+        for post in self.relevant_post_data:
+            if len(post["name"].split(" ")) <= 5:
+                short_titles.append(post)
+
+        def get_post_score(post): # Dict -> Int
+            return post["score"]
+
+        short_titles.sort(key=get_post_score)
+        return short_titles
+
 if __name__ == '__main__':
+    active = True
     crawler = Crawler("https://news.ycombinator.com/")
     crawler.crawl()
-    print(crawler.relevant_post_data)
+
+    pprint(crawler.relevant_post_data)
+    print("These were the 30 most recent posts on YCombinator News")
+
+    while active:
+        print("What else would you like to see?")
+        print("You may type the following keywords: ")
+        print("1) 'long' to see the long titled posts")
+        print("2) 'short' to see the long titled posts")
+        print("3) 'refresh' to see the most 30 recent posts on YCombinator News")
+        print("4) 'quit' to quit")
+
+
+        preference = input("Please type your keyword here: ")
+        match preference:
+            case "long":
+                print("Here are the posts with a title longer than 5 words, ordered by the number of comments: ")
+                pprint(crawler.long_titles_ordered_by_comments())
+            case "short":
+                print("Here are the posts with a title 5 words or shorter, ordered by their score: ")
+                pprint(crawler.short_titles_ordered_by_score())
+            case "refresh":
+                print("One second, let me make a new request...")
+                crawler.crawl()
+                pprint(crawler.relevant_post_data)
+            case "quit":
+                print("Quitting time!")
+                active = False
+            case _:
+                print("Please enter an acceptable option next time")
+
+    print("I know you'll come crawling back sooner or later!")
