@@ -49,7 +49,7 @@ class Crawler:
         def get_post_comment_count(post): # Dict -> Int
             return post["comment_count"]
 
-        long_titles.sort(key=get_post_comment_count)
+        long_titles.sort(reverse=True, key=get_post_comment_count)
         return long_titles
 
     def short_titles_ordered_by_score(self): # None -> List(Dict)
@@ -61,7 +61,7 @@ class Crawler:
         def get_post_score(post): # Dict -> Int
             return post["score"]
 
-        short_titles.sort(key=get_post_score)
+        short_titles.sort(reverse=True, key=get_post_score)
         return short_titles
 
 if __name__ == '__main__':
