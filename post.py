@@ -1,5 +1,3 @@
-from bs4 import BeautifulSoup
-
 class Post:
     def __init__(self, post_info, subtext):
         self.name = post_info.find("span", {"class": "titleline"}).find("a").get_text()
