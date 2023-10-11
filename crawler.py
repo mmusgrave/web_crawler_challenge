@@ -1,6 +1,7 @@
 import requests
 from pprint import pprint
 from bs4 import BeautifulSoup
+from post import Post
 
 class Crawler:
     def __init__(self, url):
@@ -11,22 +12,7 @@ class Crawler:
     def __extract_relevant_post_data(self, posts, subtext): # List -> List -> List(Dict)
         post_data = []
         for i in range(30):
-            post_info = {}
-            post_info["name"] = posts[i].find("span", {"class": "titleline"}).find("a").get_text()
-            post_info["rank"] = int(posts[i].find("span", {"class": "rank"}).get_text().split('.')[0])
-
-            score_span = subtext[i].find("span", {"class": "score"})
-            if score_span != None:
-                post_info["score"] = int(score_span.get_text().split(' ')[0])
-            else:
-                post_info["score"] = 0
-
-            comment_count_string = subtext[i].find_all("a")[-1].get_text().split('\xa0')[0]
-            if comment_count_string != "discuss" and comment_count_string != "hide":
-                post_info["comment_count"] = int(comment_count_string)
-            else:
-                post_info["comment_count"] = 0
-
+            post_info = Post(posts[i], subtext[i])
             post_data.append(post_info)
 
         return post_data
@@ -50,11 +36,11 @@ class Crawler:
     def long_titles_ordered_by_comments(self): # None -> List(Dict)
         long_titles = []
         for post in self.relevant_post_data:
-            if len(post["name"].split(" ")) > 5:
+            if len(post.name.split(" ")) > 5:
                 long_titles.append(post)
 
         def get_post_comment_count(post): # Dict -> Int
-            return post["comment_count"]
+            return post.comment_count
 
         long_titles.sort(reverse=True, key=get_post_comment_count)
         return long_titles
@@ -62,11 +48,11 @@ class Crawler:
     def short_titles_ordered_by_score(self): # None -> List(Dict)
         short_titles = []
         for post in self.relevant_post_data:
-            if len(post["name"].split(" ")) <= 5:
+            if len(post.name.split(" ")) <= 5:
                 short_titles.append(post)
 
         def get_post_score(post): # Dict -> Int
-            return post["score"]
+            return post.score
 
         short_titles.sort(reverse=True, key=get_post_score)
         return short_titles
@@ -76,10 +62,12 @@ if __name__ == '__main__':
     crawler = Crawler("https://news.ycombinator.com/")
     crawler.crawl()
 
-    pprint(crawler.relevant_post_data)
+    for post in crawler.relevant_post_data:
+        post.print_attrs()
     print("These were the 30 most recent posts on YCombinator News")
 
     while active:
+        print()
         print("What else would you like to see?")
         print("You may type the following keywords: ")
         print("1) 'long' to see the long titled posts")
@@ -89,17 +77,21 @@ if __name__ == '__main__':
 
 
         preference = input("Please type your keyword here: ")
+        print()
         match preference:
             case "long":
                 print("Here are the posts with a title longer than 5 words, ordered by the number of comments: ")
-                pprint(crawler.long_titles_ordered_by_comments())
+                for post in crawler.long_titles_ordered_by_comments():
+                    post.print_attrs()
             case "short":
                 print("Here are the posts with a title 5 words or shorter, ordered by their score: ")
-                pprint(crawler.short_titles_ordered_by_score())
+                for post in crawler.short_titles_ordered_by_score():
+                    post.print_attrs()
             case "refresh":
                 print("One second, let me make a new request...")
                 crawler.crawl()
-                pprint(crawler.relevant_post_data)
+                for post in crawler.relevant_post_data:
+                    post.print_attrs()
             case "quit":
                 print("Quitting time!")
                 active = False
