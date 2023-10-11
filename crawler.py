@@ -10,15 +10,24 @@ class Crawler:
 
     def __extract_relevant_post_data(self, posts, subtext): # List -> List -> List(Dict)
         post_data = []
-
+        pprint(subtext)
         for i in range(30):
             post_info = {}
-
+            print(i)
             post_info["name"] = posts[i].find("span", {"class": "titleline"}).find("a").get_text()
             post_info["rank"] = int(posts[i].find("span", {"class": "rank"}).get_text().split('.')[0])
-            post_info["score"] = int(subtext[i].find("span", {"class": "score"}).get_text().split(' ')[0])
+
+            score_span = subtext[i].find("span", {"class": "score"})
+            if score_span != None:
+                post_info["score"] = int(score_span.get_text().split(' ')[0])
+            else:
+                post_info["score"] = 0
+
             comment_count_string = subtext[i].find_all("a")[-1].get_text().split('\xa0')[0]
-            post_info["comment_count"] = int(comment_count_string) if comment_count_string != "discuss" else 0
+            if comment_count_string != "discuss" and comment_count_string != "hide":
+                post_info["comment_count"] = int(comment_count_string)
+            else:
+                post_info["comment_count"] = 0
 
             post_data.append(post_info)
 
