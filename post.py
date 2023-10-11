@@ -1,4 +1,3 @@
-# # TODO: Implement post object within crawler.py
 from bs4 import BeautifulSoup
 
 class Post:
