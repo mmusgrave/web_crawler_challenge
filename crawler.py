@@ -10,10 +10,8 @@ class Crawler:
 
     def __extract_relevant_post_data(self, posts, subtext): # List -> List -> List(Dict)
         post_data = []
-        pprint(subtext)
         for i in range(30):
             post_info = {}
-            print(i)
             post_info["name"] = posts[i].find("span", {"class": "titleline"}).find("a").get_text()
             post_info["rank"] = int(posts[i].find("span", {"class": "rank"}).get_text().split('.')[0])
 
